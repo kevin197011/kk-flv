@@ -1,0 +1,76 @@
+# Default values for kk-flv.
+# Image registry and names (x86 images from GitHub Actions)
+global:
+  imageRegistry: ghcr.io
+  imagePullSecrets: []
+
+backend:
+  image:
+    repository: kevin197011/kk-flv-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 8080
+  env:
+    ADDR: ":8080"
+  resources: {}
+  # resources:
+  #   limits:
+  #     cpu: 200m
+  #     memory: 128Mi
+  #   requests:
+  #     cpu: 50m
+  #     memory: 64Mi
+
+frontend:
+  image:
+    repository: kevin197011/kk-flv-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 3000
+  env: {}
+  # API_PROXY_TARGET is set automatically to backend service URL
+  resources: {}
+  # resources:
+  #   limits:
+  #     cpu: 300m
+  #     memory: 256Mi
+  #   requests:
+  #     cpu: 100m
+  #     memory: 128Mi
+
+# Optional: Ingress for frontend (and optionally backend)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: kk-flv.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: kk-flv-tls
+  #    hosts:
+  #      - kk-flv.example.com
+
+# Optional: Istio VirtualService (proxy traffic by domain to frontend)
+istio:
+  virtualService:
+    enabled: false
+    # Gateway name (must exist in cluster, e.g. istio-system/istio-gateway)
+    gateway:
+      namespace: istio-system
+      name: istio-gateway
+    # Domains to accept (traffic routed to frontend)
+    hosts:
+      - kk-flv.example.com
+    # Optional: TLS (use Gateway's TLS if already configured)
+    # tls:
+    #   mode: SIMPLE
+    #   credentialName: kk-flv-tls

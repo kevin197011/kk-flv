@@ -1,0 +1,20 @@
+1. Get the application URL by running these commands:
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+{{- else if contains "NodePort" .Values.frontend.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "kk-flv.frontend.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.frontend.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+  kubectl --namespace {{ .Release.Namespace }} get services -w {{ include "kk-flv.frontend.fullname" . }}
+{{- else if contains "ClusterIP" .Values.frontend.service.type }}
+  kubectl --namespace {{ .Release.Namespace }} port-forward service/{{ include "kk-flv.frontend.fullname" . }} 3000:3000
+  echo "Open http://127.0.0.1:3000"
+{{- end }}
+
+2. Backend (FLV proxy) is available at service {{ include "kk-flv.backend.fullname" . }}:8080 (cluster-internal).

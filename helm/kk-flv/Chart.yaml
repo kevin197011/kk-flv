@@ -1,0 +1,11 @@
+apiVersion: v2
+name: kk-flv
+description: FLV proxy player - backend pulls FLV stream, frontend plays via flv.js
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - flv
+  - stream
+  - proxy
+maintainers: []

@@ -1,0 +1,24 @@
+{{- if .Values.istio.virtualService.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "kk-flv.frontend.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "kk-flv.name" . }}-frontend
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  hosts:
+    {{- toYaml .Values.istio.virtualService.hosts | nindent 4 }}
+  gateways:
+    - {{ .Values.istio.virtualService.gateway.namespace }}/{{ .Values.istio.virtualService.gateway.name }}
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: {{ include "kk-flv.frontend.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+            port:
+              number: {{ .Values.frontend.service.port }}
+          weight: 100
+{{- end }}
