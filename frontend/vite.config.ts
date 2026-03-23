@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    allowedHosts: true,
     // Avoid 403 when opening page with ?url=https://... (query can be mistaken for path in Docker)
     fs: {
       allow: ['.', '..', '/app'],
